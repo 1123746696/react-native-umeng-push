@@ -148,6 +148,73 @@ RCT_EXPORT_METHOD(getDeviceToken:(RCTResponseSenderBlock)callback) {
 #endif
 }
 
+
+RCT_EXPORT_METHOD(setAppkeyAndSecret:(NSString *)key secret:(NSString *)secret){
+    //注册友盟推送
+    NSUserDefaults *user = [NSUserDefaults standardUserDefaults];
+    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *umengKey = [user objectForKey:[NSString stringWithFormat:@"UmengPush%@",version]];
+    if(!umengKey||![umengKey isEqualToString:key]){
+        [RCTUmengPush registerWithAppkey:key launchOptions:[NSDictionary dictionary]];
+        [user setObject:key forKey:[NSString stringWithFormat:@"UmengPush%@",version]];
+        [user synchronize];
+    }
+}
+RCT_EXPORT_METHOD(addAlias:(NSString *)alias type:(NSString *)type){
+    NSLog(@"alias:%@",alias);
+    NSString *newType = type;
+    if(!(newType&&newType.length>0)){
+        newType=kUMessageAliasTypeSina;
+    }
+    [UMessage addAlias:alias type:newType response:^(id responseObject, NSError *error) {
+        
+    }];
+}
+RCT_EXPORT_METHOD(setAlias:(NSString *)alias type:(NSString *)type){
+    NSString *newType = type;
+    if(!(newType&&newType.length>0)){
+        newType=kUMessageAliasTypeSina;
+    }
+    [UMessage setAlias:alias type:newType response:^(id responseObject, NSError *error) {
+        
+    }];
+}
+RCT_EXPORT_METHOD(removeAlias:(NSString *)alias type:(NSString *)type){
+    NSString *newType = type;
+    if(!(newType&&newType.length>0)){
+        newType=kUMessageAliasTypeSina;
+    }
+    [UMessage removeAlias:alias type:newType response:^(id responseObject, NSError *error) {
+        
+    }];
+}
++ (void)registerWithLaunchOptions:(NSDictionary *)launchOptions{
+    //注册友盟推送
+    NSUserDefaults *user = [NSUserDefaults standardUserDefaults];
+    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *umengKey = [user objectForKey:[NSString stringWithFormat:@"UmengPush%@",version]];
+    if(umengKey){
+        [RCTUmengPush registerWithAppkey:umengKey launchOptions:launchOptions];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 + (void)application:(UIApplication *)application didRegisterDeviceToken:(NSData *)deviceToken {
     [RCTUmengPush sharedInstance].deviceToken = [[[[deviceToken description] stringByReplacingOccurrencesOfString: @"<" withString: @""]
                                                   stringByReplacingOccurrencesOfString: @">" withString: @""]

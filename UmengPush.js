@@ -14,6 +14,20 @@ var receiveMessageSubscript, openMessageSubscription;
 
 var UmengPush = {
 
+  setAppkeyAndSecret(key:String,secret:String) {
+    UmengPushModule.setAppkeyAndSecret(key,secret);
+  },
+  addAlias(alias:String,type:String) {
+    UmengPushModule.addAlias(alias,type);
+  },
+  setAlias(alias:String,type:String) {
+    UmengPushModule.setAlias(alias,type);
+  },
+
+  removeAlias(alias:String,type:String) {
+    UmengPushModule.removeAlias(alias,type);
+  },
+  
   getDeviceToken(handler: Function) {
     UmengPushModule.getDeviceToken(handler);
   },

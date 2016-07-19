@@ -11,6 +11,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.umeng.message.ALIAS_TYPE;
+import com.umeng.message.PushAgent;
 import com.umeng.message.UmengRegistrar;
 import com.umeng.message.entity.UMessage;
 
@@ -63,7 +65,48 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
         String registrationId = UmengRegistrar.getRegistrationId(mReactContext);
         callback.invoke(registrationId == null ? mPushApplication.mRegistrationId : registrationId);
     }
-
+    /***
+     * 设置umeng的Key和secret
+     * @param key     umeng的key
+     * @param secret  umeng的secret
+     */
+    @ReactMethod
+    public void setAppkeyAndSecret(String key,String secret) {
+        PushAgent.getInstance(getCurrentActivity()).setAppkeyAndSecret(key, secret);
+    }
+    @ReactMethod
+    public void addAlias(String alias,String type) {
+        try {
+            String newType = type;
+            if (type.isEmpty()||type.length()==0){
+                newType=ALIAS_TYPE.SINA_WEIBO;
+            }
+            PushAgent.getInstance(getCurrentActivity()).addAlias(alias,newType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @ReactMethod
+    public void setAlias(String alias,String type) {
+        String newType = type;
+        if (type.isEmpty()||type.length()==0){
+            newType=ALIAS_TYPE.SINA_WEIBO;
+        }
+        PushAgent.getInstance(getCurrentActivity()).setAlias(alias,newType);
+    }
+    @ReactMethod
+    public void removeAlias(String alias,String type) {
+        try {
+            String newType = type;
+            if (type.isEmpty()||type.length()==0){
+                newType=ALIAS_TYPE.SINA_WEIBO;
+            }
+            PushAgent.getInstance(getCurrentActivity()).removeAlias(alias,newType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ;
+    }
     private WritableMap convertToWriteMap(UMessage msg) {
         WritableMap map = Arguments.createMap();
         //遍历Json
