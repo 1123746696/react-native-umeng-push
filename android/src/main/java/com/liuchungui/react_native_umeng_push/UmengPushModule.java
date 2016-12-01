@@ -1,6 +1,7 @@
 package com.liuchungui.react_native_umeng_push;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.facebook.react.bridge.ReadableType.Map;
+
 /**
  * Created by user on 16/4/7.
  */
@@ -29,10 +32,10 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
     protected static final String TAG = UmengPushModule.class.getSimpleName();
     protected static final String DidReceiveMessage = "DidReceiveMessage";
     protected static final String DidOpenMessage = "DidOpenMessage";
-
+    
     private UmengPushApplication mPushApplication;
     private ReactApplicationContext mReactContext;
-
+    
     public UmengPushModule(ReactApplicationContext reactContext) {
         super(reactContext);
         mReactContext = reactContext;
@@ -42,12 +45,12 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
         //添加监听
         mReactContext.addLifecycleEventListener(this);
     }
-
+    
     @Override
     public String getName() {
         return "UmengPush";
     }
-
+    
     @Override
     public Map<String, Object> getConstants() {
         final Map<String, Object> constants = new HashMap<>();
@@ -55,7 +58,7 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
         constants.put(DidOpenMessage, DidOpenMessage);
         return constants;
     }
-
+    
     /**
      * 获取设备id
      * @param callback
@@ -72,16 +75,17 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
      */
     @ReactMethod
     public void setAppkeyAndSecret(String key,String secret) {
-        PushAgent.getInstance(getCurrentActivity()).setAppkeyAndSecret(key, secret);
+        PushAgent.getInstance(mReactContext.getApplicationContext()).setAppkeyAndSecret(key, secret);
+        
     }
     @ReactMethod
     public void addAlias(String alias,String type) {
         try {
             String newType = type;
-            if (type.isEmpty()||type.length()==0){
+            if (TextUtils.isEmpty(type)){
                 newType=ALIAS_TYPE.SINA_WEIBO;
             }
-            PushAgent.getInstance(getCurrentActivity()).addAlias(alias,newType);
+            PushAgent.getInstance(mReactContext.getApplicationContext()).setAlias(alias,newType);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,21 +93,22 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
     @ReactMethod
     public void setAlias(String alias,String type) {
         String newType = type;
-        if (type.isEmpty()||type.length()==0){
+        if (TextUtils.isEmpty(type)){
             newType=ALIAS_TYPE.SINA_WEIBO;
         }
-        PushAgent.getInstance(getCurrentActivity()).setAlias(alias,newType);
+        PushAgent.getInstance(mReactContext.getApplicationContext()).setExclusiveAlias(alias,newType);
     }
     @ReactMethod
     public void removeAlias(String alias,String type) {
         try {
             String newType = type;
-            if (type.isEmpty()||type.length()==0){
+            if (TextUtils.isEmpty(type)){
                 newType=ALIAS_TYPE.SINA_WEIBO;
             }
-            PushAgent.getInstance(getCurrentActivity()).removeAlias(alias,newType);
+            PushAgent.getInstance(mReactContext).deleteAlias(alias,newType);
         } catch (Exception e) {
             e.printStackTrace();
+            Log.v("umeng",e+"");
         }
         ;
     }
@@ -124,37 +129,37 @@ public class UmengPushModule extends ReactContextBaseJavaModule implements Lifec
         }
         return map;
     }
-
-
+    
+    
     protected void sendEvent(String eventName, UMessage msg) {
         sendEvent(eventName, convertToWriteMap(msg));
     }
-
+    
     private void sendEvent(String eventName, @Nullable WritableMap params) {
         //此处需要添加hasActiveCatalystInstance，否则可能造成崩溃
         //问题解决参考: https://github.com/walmartreact/react-native-orientation-listener/issues/8
         if(mReactContext.hasActiveCatalystInstance()) {
             Log.i(TAG, "hasActiveCatalystInstance");
             mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(eventName, params);
+            .emit(eventName, params);
         }
         else {
             Log.i(TAG, "not hasActiveCatalystInstance");
         }
     }
-
+    
     @Override
     public void onHostResume() {
         mPushApplication.setmPushModule(this);
     }
-
+    
     @Override
     public void onHostPause() {
     }
-
+    
     @Override
     public void onHostDestroy() {
         mPushApplication.setmPushModule(null);
     }
-
+    
 }
