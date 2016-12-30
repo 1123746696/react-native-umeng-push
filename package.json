@@ -6,7 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "react-native-umeng-sdk": "git+https://github.com/1123746696/react-native-umeng-sdk.git#1.0.2"
+    "react-native-umeng-sdk": "git+https://github.com/1123746696/react-native-umeng-sdk.git#with_utdid_jar_1.0.3"
   },
   "main": "UmengPush.js",
   "devDependencies": {},
